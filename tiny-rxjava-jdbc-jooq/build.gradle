@@ -1,0 +1,12 @@
+plugins {
+    id "com.jfrog.bintray" version "1.2"
+}
+
+description = 'Jooq integration for tiny-rxjava-jdbc'
+
+dependencies {
+    compile project(':tiny-rxjava-jdbc-core')
+    compile 'org.jooq:jooq:3.7.3'
+}
+
+apply from: '../bintray.gradle'

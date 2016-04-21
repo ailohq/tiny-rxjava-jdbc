@@ -1,0 +1,12 @@
+plugins {
+    id "com.jfrog.bintray" version "1.2"
+}
+
+description = 'H2 integration for tiny-rxjava-jdbc'
+
+dependencies {
+    compile project(':tiny-rxjava-jdbc-core')
+    compile 'com.h2database:h2:1.4.191'
+}
+
+apply from: '../bintray.gradle'

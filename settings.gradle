@@ -1,0 +1,9 @@
+rootProject.name = 'tiny-rxjava-jdbc'
+
+include 'tiny-rxjava-jdbc-core'
+include 'tiny-rxjava-jdbc-h2'
+include 'tiny-rxjava-jdbc-test'
+include 'tiny-rxjava-jdbc-query'
+include 'tiny-rxjava-jdbc-jooq'
+include 'tiny-rxjava-jdbc-pg'
+

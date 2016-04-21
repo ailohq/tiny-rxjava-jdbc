@@ -1,0 +1,15 @@
+plugins {
+    id "com.jfrog.bintray" version "1.2"
+}
+
+description = 'Test helpers for tiny-rxjava-jdbc'
+
+dependencies {
+    compile project(':tiny-rxjava-jdbc-core')
+    compile 'org.liquibase:liquibase-core:3.4.2'
+
+    testCompile project(':tiny-rxjava-jdbc-h2')
+    testCompile project(':tiny-rxjava-jdbc-jooq')
+}
+
+apply from: '../bintray.gradle'

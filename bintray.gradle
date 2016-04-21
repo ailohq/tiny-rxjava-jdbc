@@ -1,0 +1,34 @@
+task bintrayDelete << {
+    def deleteUrl = ['curl', '-u',
+                     bintrayUser + ':' + bintrayApiKey,
+                     '-X',
+                     'DELETE',
+                     "https://api.bintray.com/packages/trunkplatform/${rootProject.name}/${project.name}/versions/${version}/"].execute()
+
+    println("delete: " + deleteUrl.text)
+}
+
+def bintrayUser = project.hasProperty('bintrayUser') ? bintrayUser : 'test'
+def bintrayApiKey = project.hasProperty('bintrayApiKey') ? bintrayApiKey : 'test'
+
+bintray {
+    user = bintrayUser
+    key = bintrayApiKey
+
+    publications = ['mavenJava']
+
+    dryRun = false //Whether to run this as dry-run, without deploying
+    publish = true //If version should be auto published after an upload
+    pkg {
+        repo = 'trunk-java-oss'
+        userOrg = 'trunkplatform'
+        name = project.name
+        desc = description
+        websiteUrl = "https://github.com/Trunkplatform/${rootProject.name}"
+        issueTrackerUrl = "https://github.com/Trunkplatform/${rootProject.name}/issues"
+        vcsUrl = "https://github.com/Trunkplatform/${rootProject.name}.git"
+        licenses = ['MIT']
+        labels = ['java']
+        publicDownloadNumbers = true
+    }
+}
