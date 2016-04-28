@@ -2,8 +2,6 @@
 
 TBD status lozenges
 
-Functional access to JDBC using RxJava
-
 A simple RxJava wrapper around JDBC that lets you convert JDBC `Connections` to
 [RxJava](https://github.com/ReactiveX/RxJava)
 [Observables](https://github.com/ReactiveX/RxJava/wiki/Observable).
@@ -15,6 +13,16 @@ The two main drivers for developing this library were:
 
 For query chaining and ORM-like access use [rxjava-jdbc](https://github.com/davidmoten/rxjava-jdbc).
 
+
+## Building
+
+Using `tiny-rxjava-jdbc` uses [Gradle](http://gradle.org/) for build.
+
+```bash
+git clone https://github.com/Trunkplatform/tiny-rxjava-jdbc.git
+cd tiny-rxjava-jdbc
+./gradlew clean build
+```
 
 ## tiny-rxjava-jdbc-core
 
@@ -172,3 +180,14 @@ ConnectionProvider connectionProvider = ...;
 Observable<ConnectionProvider> pool = LiquibaseBootstrap.using(connectionProvider, "test/sample_update.xml");
 ```
 
+## License
+
+Code ported from [rxjava-jdbc is copyright David Morten](https://github.com/davidmoten/rxjava-jdbc/).
+
+All other material copyright 2016 Trunk Platform.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+> http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
