@@ -182,7 +182,7 @@ Observable<ConnectionProvider> pool = LiquibaseBootstrap.using(connectionProvide
 
 ## License
 
-Code ported from [rxjava-jdbc is copyright David Morten](https://github.com/davidmoten/rxjava-jdbc/).
+Code ported from [rxjava-jdbc is copyright David Moten](https://github.com/davidmoten/rxjava-jdbc/).
 
 All other material copyright 2016 Trunk Platform.
 
