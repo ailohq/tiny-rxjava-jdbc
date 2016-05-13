@@ -1,4 +1,4 @@
-package com.trunk.rx.jdbc.h2;
+package com.trunk.rx.jdbc.pg;
 
 import java.sql.Connection;
 import java.sql.SQLException;
