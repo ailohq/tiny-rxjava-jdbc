@@ -7,6 +7,7 @@ description = 'PostgreSQL integration for tiny-rxjava-jdbc'
 dependencies {
     compile project(':tiny-rxjava-jdbc-core')
     compile 'org.postgresql:postgresql:9.4-1201-jdbc41'
+    compile 'com.zaxxer:HikariCP:2.4.7'
 }
 
 apply from: '../bintray.gradle'
