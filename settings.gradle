@@ -6,4 +6,4 @@ include 'tiny-rxjava-jdbc-test'
 include 'tiny-rxjava-jdbc-query'
 include 'tiny-rxjava-jdbc-jooq'
 include 'tiny-rxjava-jdbc-pg'
-
+include 'tiny-rxjava-jdbc-pg-guice'

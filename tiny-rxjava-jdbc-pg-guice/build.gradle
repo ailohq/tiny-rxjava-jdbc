@@ -1,0 +1,16 @@
+plugins {
+    id "com.jfrog.bintray" version "1.2"
+}
+
+description = 'Archaius/Guice module for tiny-rxjava-jdbc-pg'
+
+dependencies {
+    compile project(':tiny-rxjava-jdbc-pg')
+    compile 'com.google.inject:guice:4.0'
+    compile 'com.netflix.archaius:archaius2-core:2.1.4'
+    compile 'com.netflix.archaius:archaius2-guice:2.1.4'
+
+    testCompile 'org.postgresql:postgresql:9.4-1201-jdbc41'
+}
+
+apply from: '../bintray.gradle'

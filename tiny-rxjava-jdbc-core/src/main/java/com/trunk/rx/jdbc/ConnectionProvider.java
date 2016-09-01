@@ -1,8 +1,8 @@
 package com.trunk.rx.jdbc;
 
-import java.sql.Connection;
-
 import rx.Observable;
+
+import java.sql.Connection;
 
 /**
  * A function to hoist {@link Connection}s into {@link Observable}s. This can be used to wrap

@@ -1,5 +1,7 @@
 package com.trunk.rx.jdbc.sql;
 
+import com.trunk.jdbc.NamedParameterPreparedStatement;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -7,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import com.trunk.jdbc.NamedParameterPreparedStatement;
 
 /**
  * An immutable class to simplify building named-parameter {@link PreparedStatement}s.

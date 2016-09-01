@@ -38,7 +38,7 @@ using the completion of the ConnectionConsumer's Observable to signal completion
  signal the need to commit a transaction.
 
 
-TBC mave/gradle
+TBC maven/gradle
 
 ### Connections
 
@@ -156,14 +156,36 @@ Observable<Integer> ids = pool
 
 ## tiny-rxjava-jdbc-pg
 
-Provides a named, pooled [PostgreSQL ConnectionProvider](https://github.com/Trunkplatform/tiny-rxjava-jdbc/blob/master/tiny-rxjava-jdbc-pg/src/main/java/com/trunk/rx/jdbc/pg/PgConnectionProvider.java).
+Provides a named, pooled [PostgreSQL ConnectionProvider](https://github.com/Trunkplatform/tiny-rxjava-jdbc/blob/master/tiny-rxjava-jdbc-pg/src/main/java/com/trunk/rx/jdbc/pg/PgConnectionProvider.java) 
+and a [Hikari](https://github.com/brettwooldridge/HikariCP) based
+[ConnectionProvider](https://github.com/Trunkplatform/tiny-rxjava-jdbc/blob/master/tiny-rxjava-jdbc-pg/src/main/java/com/trunk/rx/jdbc/pg/PgConnectionProvider.java).
 
 TBC maven/gradle
 
 ```java
 import com.trunk.rx.jdbc.pg.PgConnectionProvider;
+import com.trunk.rx.jdbc.pg.PgHikariConnectionProvider;
 
-ConnectionProvider p = new PgConnectionProvider(...);
+new PgConnectionProvider(...);
+new PgHikariConnectionProvider(...);
+```
+
+# tiny-rxjava-jdbc-pg-guice
+
+[Archaius](https://github.com/Netflix/archaius)/[Guice](https://github.com/google/guice)
+bindings for `tiny-rxjava-jdbc-pg`. `PgConnectionProvider` and `PgHikariConnectionProvider` are both 
+bound to `ConnectionProvider`, so only one of the modules should be added to any
+one `Injector`.
+
+Expects the following in your properties:
+* `database_host` the database hostname
+* `database_database` the database name
+* `database_username` the username 
+* `database_password` the password
+* `database_maxConnections` (optional) the connection pool size
+
+```java
+Injector injector = Guice.createInjector(new ArchaiusModule(), new PgConnectionProviderModule());
 ```
 
 ## tiny-rxjava-jdbc-test

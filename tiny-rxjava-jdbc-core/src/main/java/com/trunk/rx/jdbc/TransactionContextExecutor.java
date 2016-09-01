@@ -1,12 +1,11 @@
 package com.trunk.rx.jdbc;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import rx.Observable;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Allows the execution of a {@link ConnectionConsumer} in a transaction context.

@@ -1,11 +1,9 @@
 package com.trunk.rx.jdbc.test;
 
-import org.testng.annotations.Test;
-
 import com.trunk.rx.jdbc.ConnectionProvider;
 import com.trunk.rx.jdbc.h2.H2ConnectionProvider;
 import com.trunk.rx.jdbc.sql.ExecuteQuery;
-
+import org.testng.annotations.Test;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 

@@ -1,16 +1,14 @@
 package com.trunk.rx.jdbc;
 
+import com.trunk.rx.jdbc.h2.H2ConnectionProvider;
+import com.trunk.rx.jdbc.jooq.sql.Execute;
+import com.trunk.rx.jdbc.jooq.sql.Select;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.Table;
 import org.jooq.impl.SQLDataType;
 import org.testng.annotations.Test;
-
-import com.trunk.rx.jdbc.h2.H2ConnectionProvider;
-import com.trunk.rx.jdbc.jooq.sql.Execute;
-import com.trunk.rx.jdbc.jooq.sql.Select;
-
 import rx.observers.TestSubscriber;
 
 import static org.jooq.impl.DSL.field;

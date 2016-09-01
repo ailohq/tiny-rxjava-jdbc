@@ -1,11 +1,10 @@
 package com.trunk.rx.jdbc.h2;
 
+import org.testng.annotations.Test;
+import rx.observers.TestSubscriber;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.testng.annotations.Test;
-
-import rx.observers.TestSubscriber;
 
 public class H2ConnectionProviderTest {
   @Test

@@ -1,8 +1,8 @@
 package com.trunk.rx.jdbc;
 
-import java.sql.Connection;
-
 import rx.Observable;
+
+import java.sql.Connection;
 
 /**
  * A function to convert a {@link Connection}s to an {@link Observable} of Ts.
