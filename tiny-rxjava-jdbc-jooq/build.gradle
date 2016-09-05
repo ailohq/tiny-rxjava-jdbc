@@ -6,7 +6,7 @@ description = 'Jooq integration for tiny-rxjava-jdbc'
 
 dependencies {
     compile project(':tiny-rxjava-jdbc-core')
-    compile 'org.jooq:jooq:3.7.3'
+    compile 'org.jooq:jooq:3.8.4'
 }
 
 apply from: '../bintray.gradle'
