@@ -175,6 +175,7 @@ new PgHikariConnectionProvider(...);
 [Archaius](https://github.com/Netflix/archaius)/[Guice](https://github.com/google/guice)
 bindings for `tiny-rxjava-jdbc-core`. This requires a binding for a `ConnectionProvider`,
 eg `PgConnectionProviderModule` or `PgHikariConnectionProviderModule`.
+This is provided as a singleton.
 
 ```java
 Injector injector = Guice.createInjector(new ArchaiusModule(), new ConnectionPoolModule(), new PgConnectionProviderModule());
@@ -185,7 +186,7 @@ Injector injector = Guice.createInjector(new ArchaiusModule(), new ConnectionPoo
 [Archaius](https://github.com/Netflix/archaius)/[Guice](https://github.com/google/guice)
 bindings for `tiny-rxjava-jdbc-pg`. `PgConnectionProvider` and `PgHikariConnectionProvider` are both 
 bound to `ConnectionProvider`, so only one of the modules should be added to any
-one `Injector`.
+one `Injector`. These are provided as singletons.
 
 Expects the following in your properties:
 * `database_host` the database hostname

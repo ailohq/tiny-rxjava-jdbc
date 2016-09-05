@@ -2,6 +2,7 @@ package com.trunk.rx.jdbc;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import com.google.inject.Scopes;
 import com.netflix.archaius.api.Config;
 import com.trunk.rx.jdbc.ConnectionProvider;
 
@@ -12,7 +13,7 @@ public class ConnectionPoolModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(ConnectionPool.class).toProvider(Provider.class);
+    bind(ConnectionPool.class).toProvider(Provider.class).in(Scopes.SINGLETON);
   }
 
   @Singleton
