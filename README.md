@@ -170,6 +170,16 @@ new PgConnectionProvider(...);
 new PgHikariConnectionProvider(...);
 ```
 
+# tiny-rxjava-jdbc-guice
+
+[Archaius](https://github.com/Netflix/archaius)/[Guice](https://github.com/google/guice)
+bindings for `tiny-rxjava-jdbc-core`. This requires a binding for a `ConnectionProvider`,
+eg `PgConnectionProviderModule` or `PgHikariConnectionProviderModule`.
+
+```java
+Injector injector = Guice.createInjector(new ArchaiusModule(), new ConnectionPoolModule(), new PgConnectionProviderModule());
+```
+
 # tiny-rxjava-jdbc-pg-guice
 
 [Archaius](https://github.com/Netflix/archaius)/[Guice](https://github.com/google/guice)
