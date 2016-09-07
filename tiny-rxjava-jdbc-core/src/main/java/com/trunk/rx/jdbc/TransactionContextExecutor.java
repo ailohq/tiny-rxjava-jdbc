@@ -89,8 +89,10 @@ public class TransactionContextExecutor<T> extends Observable<T> {
 
   private static void closeConnection(Connection connection) {
     try {
-      log.debug("Closing connection");
-      connection.close();
+      if (!connection.isClosed()) {
+        log.debug("Closing connection");
+        connection.close();
+      }
     } catch (SQLException e) {
       log.warn("Unexpected error closing connection", e);
     }
@@ -98,8 +100,12 @@ public class TransactionContextExecutor<T> extends Observable<T> {
 
   private static void commitTransaction(Connection connection) {
     try {
-      log.debug("Committing transaction");
-      connection.commit();
+      if (!connection.isClosed()) {
+        log.debug("Committing transaction");
+        connection.commit();
+      } else {
+        log.warn("Commit called on closed connection");
+      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -107,11 +113,18 @@ public class TransactionContextExecutor<T> extends Observable<T> {
 
   private static void rollBackTransaction(Connection connection) {
     try {
-      log.debug("Rolling-back transaction");
-      connection.rollback();
+      if (!connection.isClosed()) {
+        log.debug("Rolling-back transaction");
+        connection.rollback();
+      }
     } catch (SQLException rollbackError) {
       log.warn("Rollback error", rollbackError);
     }
+  }
+
+  private static void cleanupConnection(Connection connection) {
+    rollBackTransaction(connection);
+    closeConnection(connection);
   }
 
   public interface TransactionContext {
@@ -124,10 +137,13 @@ public class TransactionContextExecutor<T> extends Observable<T> {
       return Observable.defer(
         () ->
           connection.get().flatMap(
-            c ->
-              TransactionContextExecutor.<T>withAutoCommit(c)
-                .concatWith(consumer.call(new UnclosableConnection(c)))
-                .finallyDo(() -> closeConnection(c))
+            c -> {
+              UnclosableConnection unclosableConnection = new UnclosableConnection(c);
+              return TransactionContextExecutor.<T>withAutoCommit(c)
+                .concatWith(consumer.call(unclosableConnection))
+                .doOnUnsubscribe(() -> closeConnection(c))
+                .finallyDo(() -> closeConnection(c));
+            }
           )
       );
     }
@@ -139,13 +155,15 @@ public class TransactionContextExecutor<T> extends Observable<T> {
       return Observable.defer(
         () ->
           connection.get().flatMap(
-            c ->
-              TransactionContextExecutor.<T>withManualTransactions(c)
-                .concatWith(consumer.call(new UnclosableConnection(c)))
+            c -> {
+              UnclosableConnection unclosableConnection = new UnclosableConnection(c);
+              return TransactionContextExecutor.<T>withManualTransactions(c)
+                .concatWith(consumer.call(unclosableConnection))
                 .doOnCompleted(() -> commitTransaction(c))
                 .doOnError(e -> rollBackTransaction(c))
-                .doOnUnsubscribe(() -> rollBackTransaction(c))
-                .finallyDo(() -> closeConnection(c))
+                .doOnUnsubscribe(() -> cleanupConnection(c))
+                .finallyDo(() -> closeConnection(c));
+            }
           )
       );
     }
@@ -157,13 +175,15 @@ public class TransactionContextExecutor<T> extends Observable<T> {
       return Observable.defer(
         () ->
           connection.get().flatMap(
-            c ->
-              TransactionContextExecutor.<T>withManualTransactions(c)
-                .concatWith(consumer.call(new UnclosableConnection(c)))
+            c -> {
+              UnclosableConnection unclosableConnection = new UnclosableConnection(c);
+              return TransactionContextExecutor.<T>withManualTransactions(c)
+                .concatWith(consumer.call(unclosableConnection))
                 .doOnNext(t -> commitTransaction(c))
                 .doOnError(e -> rollBackTransaction(c))
-                .doOnUnsubscribe(() -> rollBackTransaction(c))
-                .finallyDo(() -> closeConnection(c))
+                .doOnUnsubscribe(() -> cleanupConnection(c))
+                .finallyDo(() -> closeConnection(c));
+            }
           )
       );
     }
