@@ -1,0 +1,9 @@
+export DB_USER=${SNAP_DB_PG_USER:-'postgres'}
+export DB_PASSWORD=${SNAP_DB_PG_PASSWORD:-'sa'}
+export DB_HOST=${SNAP_DB_PG_HOST:-'localhost'}
+DB_NAME=`echo $SNAP_DB_PG_URL_ALT | xargs -I{} basename {}`
+if [ "$DB_NAME" = "" ]
+then
+  DB_NAME='postgres'
+fi
+export DB_NAME

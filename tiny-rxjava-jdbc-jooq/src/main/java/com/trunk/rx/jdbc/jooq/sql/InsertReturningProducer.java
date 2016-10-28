@@ -1,48 +1,67 @@
 /**
  * Copywrite https://github.com/davidmoten/rxjava-jdbc/blob/master/LICENSE
  */
-package com.trunk.rx.jdbc.sql;
+package com.trunk.rx.jdbc.jooq.sql;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.jooq.Query;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.trunk.rx.jdbc.Util;
+import com.trunk.rx.jdbc.jooq.Util;
 
 import rx.Producer;
 import rx.Subscriber;
 
 import static rx.internal.operators.BackpressureUtils.getAndAddRequest;
 
-/**
- * A back pressure sensitive {@link Producer} over {@link ResultSet}s.
- * If the {@link Subscriber} unsubscribes before completion it will
- * cancel the request.
- */
-public class SelectProducer<T> implements Producer {
+public class InsertReturningProducer<R extends Record, T> implements Producer {
+  private static final Logger log = LoggerFactory.getLogger(InsertReturningProducer.class);
 
-  private static final Logger log = LoggerFactory.getLogger(SelectProducer.class);
-
-  private final ResultSetMapper<? extends T> resultSetMapper;
   private final Subscriber<? super T> subscriber;
-  private final PreparedStatement preparedStatement;
-  private final ResultSet resultSet;
+  private final Query query;
+  private final Iterator<? extends R> result;
+  private final RecordMapper<? super R, ? extends T> recordMapper;
+
   private volatile boolean keepGoing = true;
 
   private final AtomicLong requested = new AtomicLong(0);
 
-  public SelectProducer(ResultSetMapper<? extends T> resultSetMapper,
-                 Subscriber<? super T> subscriber,
-                 PreparedStatement preparedStatement,
-                 ResultSet resultSet) {
-    this.resultSetMapper = resultSetMapper;
+  public InsertReturningProducer(Subscriber<? super T> subscriber,
+                                 Query query,
+                                 Iterable<? extends R> result,
+                                 RecordMapper<? super R, ? extends T> recordMapper) {
     this.subscriber = subscriber;
-    this.preparedStatement = preparedStatement;
-    this.resultSet = resultSet;
+    this.query = query;
+    this.result = result.iterator();
+    this.recordMapper = recordMapper;
+  }
+
+
+  /**
+   * Processes each row of the {@link ResultSet}.
+   *
+   * @param subscriber
+   *
+   * @throws SQLException
+   */
+  private void processRow(Subscriber<? super T> subscriber) throws SQLException {
+    checkSubscription(subscriber);
+    if (!keepGoing) {
+      return;
+    }
+    if (result.hasNext()) {
+      log.trace("onNext");
+      subscriber.onNext(recordMapper.map(result.next()));
+    } else {
+      keepGoing = false;
+    }
   }
 
   @Override
@@ -108,26 +127,6 @@ public class SelectProducer<T> implements Producer {
   }
 
   /**
-   * Processes each row of the {@link ResultSet}.
-   *
-   * @param subscriber
-   *
-   * @throws SQLException
-   */
-  private void processRow(Subscriber<? super T> subscriber) throws SQLException {
-    checkSubscription(subscriber);
-    if (!keepGoing) {
-      return;
-    }
-    if (resultSet.next()) {
-      log.trace("onNext");
-      subscriber.onNext(resultSetMapper.f(resultSet));
-    } else {
-      keepGoing = false;
-    }
-  }
-
-  /**
    * Tells observer that stream is complete and closes resources.
    *
    * @param subscriber
@@ -160,10 +159,8 @@ public class SelectProducer<T> implements Producer {
    * Closes connection resources (connection, prepared statement and result set).
    */
   private void closeQuietly() {
-    log.debug("closing rs");
-    Util.closeQuietly(resultSet);
     log.debug("closing ps");
-    Util.closeQuietly(preparedStatement);
+    Util.closeQuietly(query);
   }
 
   /**

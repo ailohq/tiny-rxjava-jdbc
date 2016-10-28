@@ -8,6 +8,7 @@
              splitStatements="true"
              stripComments="true">
             CREATE TABLE test (id int);
+            CREATE TABLE test_autoid (id serial primary key, name varchar(10));
         </sql>
     </changeSet>
 </databaseChangeLog>

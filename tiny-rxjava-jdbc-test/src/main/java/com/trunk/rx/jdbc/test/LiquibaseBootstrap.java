@@ -1,17 +1,19 @@
 package com.trunk.rx.jdbc.test;
 
+import java.sql.Connection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.trunk.rx.jdbc.ConnectionProvider;
+
 import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import rx.Observable;
-
-import java.sql.Connection;
 
 import static com.trunk.rx.jdbc.Util.closeQuietly;
 

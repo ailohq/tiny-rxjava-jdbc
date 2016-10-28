@@ -1,14 +1,22 @@
 package com.trunk.rx.jdbc;
 
-import com.trunk.rx.jdbc.h2.H2ConnectionProvider;
-import com.trunk.rx.jdbc.jooq.sql.Execute;
-import com.trunk.rx.jdbc.jooq.sql.Select;
+import java.math.BigInteger;
+
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.Table;
 import org.jooq.impl.SQLDataType;
 import org.testng.annotations.Test;
+
+import com.trunk.rx.jdbc.h2.H2ConnectionProvider;
+import com.trunk.rx.jdbc.jooq.sql.Execute;
+import com.trunk.rx.jdbc.jooq.sql.InsertReturning;
+import com.trunk.rx.jdbc.jooq.sql.Select;
+import com.trunk.rx.jdbc.pg.PgConnectionProvider;
+import com.trunk.rx.jdbc.test.LiquibaseBootstrap;
+
+import rx.Observable;
 import rx.observers.TestSubscriber;
 
 import static org.jooq.impl.DSL.field;
@@ -22,7 +30,9 @@ import static rx.Observable.error;
 public class FunctionalTests {
 
   private static final Table<Record> TEST = table("test");
+  private static final Table<Record> TEST_AUTOID = table("test_autoid");
   private static final Field<Integer> ID = field("id", SQLDataType.INTEGER);
+  private static final Field<String> NAME = field("name", SQLDataType.VARCHAR);
 
   @Test
   public void shouldWorkWithAutoCommit() throws Exception {
@@ -30,7 +40,7 @@ public class FunctionalTests {
     ConnectionPool.from(new H2ConnectionProvider("FuncTest-shouldWorkWithAutoCommit"))
       .execute(
         connection ->
-          Execute.using(connection, c ->  using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
+          Execute.using(connection, c -> using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
             .cast(Object.class)
             .concatWith(
               Execute.using(connection, c -> using(c, SQLDialect.H2).insertInto(TEST, ID).values(1))
@@ -56,7 +66,7 @@ public class FunctionalTests {
     ConnectionPool.from(new H2ConnectionProvider("FuncTest-shouldWorkWithSingleCommit"))
       .execute(
         connection ->
-          Execute.using(connection, c ->  using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
+          Execute.using(connection, c -> using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
             .cast(Object.class)
             .concatWith(
               Execute.using(connection, c -> using(c, SQLDialect.H2).insertInto(TEST, ID).values(1))
@@ -84,7 +94,7 @@ public class FunctionalTests {
     ConnectionPool.from(new H2ConnectionProvider("FuncTest-shouldWorkWithCommitPerEvent"))
       .execute(
         connection ->
-          Execute.using(connection, c ->  using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
+          Execute.using(connection, c -> using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
             .cast(Object.class)
             .concatWith(
               Execute.using(connection, c -> using(c, SQLDialect.H2).insertInto(TEST, ID).values(1))
@@ -111,7 +121,7 @@ public class FunctionalTests {
     pool
       .execute(
         connection ->
-          Execute.using(connection, c ->  using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
+          Execute.using(connection, c -> using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
             .cast(Object.class)
             .concatWith(
               Execute.using(connection, c -> using(c, SQLDialect.H2).insertInto(TEST, ID).values(1))
@@ -151,7 +161,7 @@ public class FunctionalTests {
     pool
       .execute(
         connection ->
-          Execute.using(connection, c ->  using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
+          Execute.using(connection, c -> using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
             .cast(Object.class)
             .concatWith(
               Execute.using(connection, c -> using(c, SQLDialect.H2).insertInto(TEST, ID).values(1))
@@ -188,11 +198,11 @@ public class FunctionalTests {
   @Test
   public void singleTransactionShouldStoreNothingOnError() throws Exception {
     TestSubscriber<Integer> t = new TestSubscriber<>();
-    ConnectionPool pool = ConnectionPool.from(new H2ConnectionProvider("FuncTest-singleTransactionShouldStoreNothing"));
+    ConnectionPool pool = ConnectionPool.from(new H2ConnectionProvider("FuncTest-singleTransactionShouldStoreNothingOnError"));
     pool
       .execute(
         connection ->
-          Execute.using(connection, c ->  using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
+          Execute.using(connection, c -> using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
       )
       .subscribe();
     pool
@@ -231,7 +241,7 @@ public class FunctionalTests {
     pool
       .execute(
         connection ->
-          Execute.using(connection, c ->  using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
+          Execute.using(connection, c -> using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
       )
       .subscribe();
     pool
@@ -267,7 +277,7 @@ public class FunctionalTests {
     ConnectionPool pool = ConnectionPool.from(new H2ConnectionProvider("FuncTest-shouldWorkAcrossConnectionsOnSamePool"));
     pool.execute(
       connection ->
-        Execute.using(connection, c ->  using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
+        Execute.using(connection, c -> using(c, SQLDialect.H2).createTable(TEST).column(ID, ID.getDataType()))
           .cast(Object.class)
     )
       .concatWith(
@@ -295,5 +305,63 @@ public class FunctionalTests {
     t.assertNoErrors();
     t.assertCompleted();
     t.assertValues(0, 1, 1, 1, 2);
+  }
+
+  @Test
+  public void shouldReturnValuesAfterInsert() throws Exception {
+    TestSubscriber<Integer> t = new TestSubscriber<>();
+    String host = System.getenv("DB_HOST");
+    String database =  System.getenv("DB_PASSWORD");
+    String username = System.getenv("DB_USER");
+    String password = System.getenv("DB_PASSWORD");
+    Observable<ConnectionPool> cp =
+      LiquibaseBootstrap.using(
+        new PgConnectionProvider(host, database, username, password, 4)
+      ).map(ConnectionPool::from);
+    cp.flatMap(
+      pool ->
+        pool.execute(
+          connection ->
+            Execute.using(connection, c -> using(c, SQLDialect.POSTGRES).delete(TEST_AUTOID))
+              .ignoreElements()
+              .concatWith(
+                Execute.using(
+                  connection,
+                  c ->
+                    using(c, SQLDialect.POSTGRES).alterSequence("test_autoid_id_seq").restartWith(BigInteger.ONE)
+                )
+                .ignoreElements()
+              )
+              .concatWith(
+                InsertReturning.using(
+                  connection,
+                  c ->
+                    using(c, SQLDialect.POSTGRES)
+                      .insertInto(TEST_AUTOID)
+                      .set(NAME, "foo")
+                      .returning(ID),
+                  record -> record.getValue(ID)
+                )
+              )
+              .concatWith(
+                InsertReturning.using(
+                  connection,
+                  c ->
+                    using(c, SQLDialect.POSTGRES)
+                      .insertInto(TEST_AUTOID)
+                      .columns(NAME)
+                      .values("bar")
+                      .values("baz")
+                      .returning(ID),
+                  record -> record.get(ID)
+                )
+              )
+        )
+    )
+      .subscribe(t);
+
+    t.assertNoErrors();
+    t.assertCompleted();
+    t.assertValues(1, 2, 3);
   }
 }

@@ -9,6 +9,7 @@ dependencies {
     compile 'org.liquibase:liquibase-core:3.4.2'
 
     testCompile project(':tiny-rxjava-jdbc-h2')
+    testCompile project(':tiny-rxjava-jdbc-pg')
     testCompile project(':tiny-rxjava-jdbc-jooq')
 }
 

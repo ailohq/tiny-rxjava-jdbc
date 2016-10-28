@@ -1,17 +1,13 @@
 package com.trunk.rx.jdbc;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.ProvisionException;
-import com.netflix.archaius.guice.ArchaiusModule;
-import com.trunk.rx.jdbc.ConnectionPoolModule;
-import com.trunk.rx.jdbc.ConnectionProvider;
-import com.trunk.rx.jdbc.pg.PgConnectionProvider;
-import com.trunk.rx.jdbc.pg.PgConnectionProviderModule;
-import com.trunk.rx.jdbc.pg.PgHikariConnectionProvider;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.netflix.archaius.guice.ArchaiusModule;
+import com.trunk.rx.jdbc.pg.PgConnectionProviderModule;
+
+import static org.testng.Assert.assertEquals;
 
 public class ConnectionPoolModuleTest {
   @Test

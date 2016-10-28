@@ -1,15 +1,17 @@
 package com.trunk.rx.jdbc.sql;
 
-import com.trunk.rx.jdbc.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import rx.Observable;
-import rx.Subscriber;
-import rx.subscriptions.Subscriptions;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.trunk.rx.jdbc.Util;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.subscriptions.Subscriptions;
 
 /**
  * An observable that wraps {@link PreparedStatement#executeQuery()} from the given

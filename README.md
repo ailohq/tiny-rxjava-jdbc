@@ -24,6 +24,9 @@ cd tiny-rxjava-jdbc
 ./gradlew clean build
 ```
 
+Running the tests for `tiny-rxjava-jdbc-test` requires postgres to be installed.
+See `db-env`.
+
 ## tiny-rxjava-jdbc-core
 
 Provides access to core JDBC functionality.
@@ -132,6 +135,8 @@ Use [jOOQ's](http://www.jooq.org/) DSL to query your database.
 
 * Select using [ExecuteSelect](https://github.com/Trunkplatform/tiny-rxjava-jdbc/blob/master/tiny-rxjava-jdbc-jooq/src/main/java/com/trunk/rx/jdbc/jooq/sql/Select.java)
 * Modify using [Execute](https://github.com/Trunkplatform/tiny-rxjava-jdbc/blob/master/tiny-rxjava-jdbc-jooq/src/main/java/com/trunk/rx/jdbc/jooq/sql/Execute.java)
+* Insert Returning using [InsertReturning](https://github.com/Trunkplatform/tiny-rxjava-jdbc/blob/master/tiny-rxjava-jdbc-jooq/src/main/java/com/trunk/rx/jdbc/jooq/sql/InsertReturning.java)
+  when supported by the database. 
 
 See [FunctionalTests.java](https://github.com/Trunkplatform/tiny-rxjava-jdbc/blob/master/tiny-rxjava-jdbc-test/src/test/java/com/trunk/rx/jdbc/FunctionalTests.java)
 for examples.

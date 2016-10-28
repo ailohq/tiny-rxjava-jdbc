@@ -1,13 +1,15 @@
 package com.trunk.rx.jdbc.pg;
 
-import com.trunk.rx.jdbc.ConnectionProvider;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import org.postgresql.ds.PGPoolingDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rx.Observable;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import com.trunk.rx.jdbc.ConnectionProvider;
+
+import rx.Observable;
 
 /**
  * A native PostgreSQL ConnectionProvider using {@link PGPoolingDataSource}

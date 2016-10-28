@@ -1,9 +1,10 @@
 package com.trunk.rx.jdbc;
 
-import org.testng.annotations.Test;
-import rx.observers.TestSubscriber;
-
 import java.sql.Connection;
+
+import org.testng.annotations.Test;
+
+import rx.observers.TestSubscriber;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
