@@ -1,12 +1,11 @@
 package com.trunk.rx.jdbc.pg;
 
-import org.testng.annotations.Test;
-
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.ProvisionException;
 import com.netflix.archaius.guice.ArchaiusModule;
 import com.trunk.rx.jdbc.ConnectionProvider;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 

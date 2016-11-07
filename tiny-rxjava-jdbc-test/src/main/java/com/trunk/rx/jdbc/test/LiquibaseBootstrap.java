@@ -1,19 +1,16 @@
 package com.trunk.rx.jdbc.test;
 
-import java.sql.Connection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.trunk.rx.jdbc.ConnectionProvider;
-
 import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import rx.Observable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
 
 import static com.trunk.rx.jdbc.Util.closeQuietly;
 
@@ -34,7 +31,7 @@ public class LiquibaseBootstrap {
    * @param updateFiles the paths on the classpath to any additional update files
    * @return the connectionProvider
    */
-  public static Observable<ConnectionProvider> using(ConnectionProvider connectionProvider, String... updateFiles) {
+  public static ConnectionProvider using(ConnectionProvider connectionProvider, String... updateFiles) {
     return bootstrap(connectionProvider, updateFiles);
   }
 
@@ -42,11 +39,10 @@ public class LiquibaseBootstrap {
     // do nothing
   }
 
-  private static Observable<ConnectionProvider> bootstrap(ConnectionProvider connectionProvider, String[] updateFiles) {
-    return connectionProvider.get()
-      .doOnNext(connection -> runLiquibaseUpgrade(updateFiles, connection))
-      .map(ignore -> connectionProvider)
-      .take(1);
+  private static ConnectionProvider bootstrap(ConnectionProvider connectionProvider, String[] updateFiles) {
+    runLiquibaseUpgrade(updateFiles, connectionProvider.call());
+
+    return connectionProvider;
   }
 
   private static void runLiquibaseUpgrade(String[] updateFiles, Connection connection){

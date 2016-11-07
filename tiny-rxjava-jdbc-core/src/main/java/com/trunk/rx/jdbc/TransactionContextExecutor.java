@@ -1,12 +1,11 @@
 package com.trunk.rx.jdbc;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import rx.Observable;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Allows the execution of a {@link ConnectionConsumer} in a transaction context.
@@ -27,14 +26,14 @@ public class TransactionContextExecutor<T> extends Observable<T> {
   public static final SingleTransactionTransactionContext SINGLE_TRANSACTION_TRANSACTION_CONTEXT = new SingleTransactionTransactionContext();
   public static final TransactionPerEventTransactionContext TRANSACTION_PER_EVENT_TRANSACTION_CONTEXT = new TransactionPerEventTransactionContext();
 
-  private final ConnectionProvider connection;
+  private final ConnectionProvider provider;
   private final ConnectionConsumer<T> connectionConsumer;
 
   public TransactionContextExecutor(TransactionContext transactionContext,
-                                    ConnectionProvider connection,
+                                    ConnectionProvider provider,
                                     ConnectionConsumer<T> connectionConsumer) {
-    super(subscriber -> transactionContext.f(connection, connectionConsumer).subscribe(subscriber));
-    this.connection = connection;
+    super(subscriber -> transactionContext.f(provider, connectionConsumer).subscribe(subscriber));
+    this.provider = provider;
     this.connectionConsumer = connectionConsumer;
   }
 
@@ -44,7 +43,7 @@ public class TransactionContextExecutor<T> extends Observable<T> {
    * @return the result of executing {@link ConnectionConsumer#call(Connection)} with auto-commit transactions
    */
   public TransactionContextExecutor<T> withAutoCommit() {
-    return new TransactionContextExecutor<>(AUTO_COMMIT_TRANSACTION_CONTEXT, connection, connectionConsumer);
+    return new TransactionContextExecutor<>(AUTO_COMMIT_TRANSACTION_CONTEXT, provider, connectionConsumer);
   }
 
   /**
@@ -54,7 +53,7 @@ public class TransactionContextExecutor<T> extends Observable<T> {
    * @return the result of executing {@link ConnectionConsumer#call(Connection)}
    */
   public TransactionContextExecutor<T> withSingleTransaction() {
-    return new TransactionContextExecutor<>(SINGLE_TRANSACTION_TRANSACTION_CONTEXT, connection, connectionConsumer);
+    return new TransactionContextExecutor<>(SINGLE_TRANSACTION_TRANSACTION_CONTEXT, provider, connectionConsumer);
   }
 
   /**
@@ -65,7 +64,7 @@ public class TransactionContextExecutor<T> extends Observable<T> {
    * @return the result of executing {@link ConnectionConsumer#call(Connection)}
    */
   public TransactionContextExecutor<T> withTransactionPerEvent() {
-    return new TransactionContextExecutor<>(TRANSACTION_PER_EVENT_TRANSACTION_CONTEXT, connection, connectionConsumer);
+    return new TransactionContextExecutor<>(TRANSACTION_PER_EVENT_TRANSACTION_CONTEXT, provider, connectionConsumer);
   }
 
   private static <T> Observable<T> withAutoCommit(Connection connection) {
@@ -128,34 +127,38 @@ public class TransactionContextExecutor<T> extends Observable<T> {
     closeConnection(connection);
   }
 
+  private static Observable<Connection> autoclosingConnection(ConnectionProvider provider) {
+    return Observable.using(
+      provider,
+      Observable::just,
+      TransactionContextExecutor::closeConnection,
+      true
+    );
+  }
+
   public interface TransactionContext {
-    <T> Observable<T> f(ConnectionProvider connection, ConnectionConsumer<T> consumer);
+    <T> Observable<T> f(ConnectionProvider provider, ConnectionConsumer<T> consumer);
   }
 
   public static class AutoCommitTransactionContext implements TransactionContext {
     @Override
-    public <T> Observable<T> f(ConnectionProvider connection, ConnectionConsumer<T> consumer) {
-      return Observable.defer(
-        () ->
-          connection.get().flatMap(
-            c -> {
-              UnclosableConnection unclosableConnection = new UnclosableConnection(c);
-              return TransactionContextExecutor.<T>withAutoCommit(c)
-                .concatWith(consumer.call(unclosableConnection))
-                .doOnUnsubscribe(() -> closeConnection(c))
-                .finallyDo(() -> closeConnection(c));
-            }
-          )
-      );
+    public <T> Observable<T> f(ConnectionProvider provider, ConnectionConsumer<T> consumer) {
+      return autoclosingConnection(provider)
+        .flatMap(
+          c -> {
+            UnclosableConnection unclosableConnection = new UnclosableConnection(c);
+            return TransactionContextExecutor.<T>withAutoCommit(c)
+              .concatWith(consumer.call(unclosableConnection));
+          }
+        );
     }
   }
 
   public static class SingleTransactionTransactionContext implements TransactionContext {
     @Override
-    public <T> Observable<T> f(ConnectionProvider connection, ConnectionConsumer<T> consumer) {
-      return Observable.defer(
-        () ->
-          connection.get().flatMap(
+    public <T> Observable<T> f(ConnectionProvider provider, ConnectionConsumer<T> consumer) {
+      return autoclosingConnection(provider)
+        .flatMap(
             c -> {
               UnclosableConnection unclosableConnection = new UnclosableConnection(c);
               return TransactionContextExecutor.<T>withManualTransactions(c)
@@ -165,17 +168,15 @@ public class TransactionContextExecutor<T> extends Observable<T> {
                 .doOnUnsubscribe(() -> cleanupConnection(c))
                 .finallyDo(() -> closeConnection(c));
             }
-          )
-      );
+          );
     }
   }
 
   public static class TransactionPerEventTransactionContext implements TransactionContext {
     @Override
-    public <T> Observable<T> f(ConnectionProvider connection, ConnectionConsumer<T> consumer) {
-      return Observable.defer(
-        () ->
-          connection.get().flatMap(
+    public <T> Observable<T> f(ConnectionProvider provider, ConnectionConsumer<T> consumer) {
+      return autoclosingConnection(provider)
+        .flatMap(
             c -> {
               UnclosableConnection unclosableConnection = new UnclosableConnection(c);
               return TransactionContextExecutor.<T>withManualTransactions(c)
@@ -185,8 +186,7 @@ public class TransactionContextExecutor<T> extends Observable<T> {
                 .doOnUnsubscribe(() -> cleanupConnection(c))
                 .finallyDo(() -> closeConnection(c));
             }
-          )
-      );
+          );
     }
   }
 }

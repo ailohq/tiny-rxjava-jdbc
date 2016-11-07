@@ -1,12 +1,10 @@
 package com.trunk.rx.jdbc;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import rx.Observable;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Provides a light weight DSL to convert {@link ConnectionProvider}s into
@@ -37,10 +35,10 @@ public class ConnectionPool implements AutoCloseable {
   public static ConnectionPool of(Connection connection) {
     return new ConnectionPool(new ConnectionProvider() {
       @Override
-      public Observable<Connection> get() {
+      public Connection call() {
         // we have to wrap the connection so it stays open when executed
         // even if it gets wrapped again when executed
-        return Observable.just(new UnclosableConnection(connection));
+        return new UnclosableConnection(connection);
       }
 
       @Override

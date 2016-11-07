@@ -1,15 +1,13 @@
 package com.trunk.rx.jdbc.pg;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.trunk.rx.jdbc.ConnectionProvider;
 import com.zaxxer.hikari.HikariDataSource;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rx.Observable;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * A native PostgreSQL ConnectionProvider using {@link com.zaxxer.hikari.HikariDataSource}

@@ -3,21 +3,19 @@
  */
 package com.trunk.rx.jdbc.jooq.sql;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicLong;
-
+import com.trunk.rx.jdbc.jooq.Util;
 import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.trunk.rx.jdbc.jooq.Util;
-
 import rx.Producer;
 import rx.Subscriber;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static rx.internal.operators.BackpressureUtils.getAndAddRequest;
 

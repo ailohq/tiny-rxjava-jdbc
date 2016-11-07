@@ -1,15 +1,12 @@
 package com.trunk.rx.jdbc.h2;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
+import com.trunk.rx.jdbc.ConnectionProvider;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.trunk.rx.jdbc.ConnectionProvider;
-
-import rx.Observable;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * A native H2 ConnectionProvider using {@link JdbcConnectionPool}
@@ -34,16 +31,12 @@ public class H2ConnectionProvider implements ConnectionProvider {
   }
 
   @Override
-  public Observable<Connection> get() {
-    return Observable.defer(
-      () -> {
-        try {
-          return Observable.just(connectionPool.getConnection());
-        } catch (SQLException e) {
-          return Observable.error(e);
-        }
-      }
-    );
+  public Connection call() {
+    try {
+      return connectionPool.getConnection();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

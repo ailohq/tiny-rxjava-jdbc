@@ -1,11 +1,10 @@
 package com.trunk.rx.jdbc;
 
+import org.testng.annotations.Test;
+import rx.Observable;
+
 import java.sql.Connection;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.testng.annotations.Test;
-
-import rx.Observable;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
@@ -20,7 +19,7 @@ public class ConnectionPoolTest {
   public void shouldExecuteWithGivenConnectionPoolProvider() throws Exception {
     Connection c = mock(Connection.class);
     ConnectionProvider cpp = mock(ConnectionProvider.class);
-    when(cpp.get()).thenReturn(Observable.just(c));
+    when(cpp.call()).thenReturn(c);
     ConnectionPool p = ConnectionPool.from(cpp);
     AtomicReference<Connection> connectionReturned = new AtomicReference<>();
     p.execute(connection -> {

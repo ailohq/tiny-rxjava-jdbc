@@ -3,18 +3,16 @@
  */
 package com.trunk.rx.jdbc.sql;
 
+import com.trunk.rx.jdbc.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import rx.Producer;
+import rx.Subscriber;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.trunk.rx.jdbc.Util;
-
-import rx.Producer;
-import rx.Subscriber;
 
 import static rx.internal.operators.BackpressureUtils.getAndAddRequest;
 

@@ -1,15 +1,12 @@
 package com.trunk.rx.jdbc.pg;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
+import com.trunk.rx.jdbc.ConnectionProvider;
+import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.trunk.rx.jdbc.ConnectionProvider;
-import com.zaxxer.hikari.HikariDataSource;
-
-import rx.Observable;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * A native PostgreSQL ConnectionProvider using {@link com.zaxxer.hikari.HikariDataSource}
@@ -34,16 +31,12 @@ public class PgHikariConnectionProvider implements ConnectionProvider {
   }
 
   @Override
-  public Observable<Connection> get() {
-    return Observable.defer(
-      () -> {
-        try {
-          return Observable.just(dataSource.getConnection());
-        } catch (SQLException e) {
-          return Observable.error(e);
-        }
-      }
-    );
+  public Connection call() {
+    try {
+      return dataSource.getConnection();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

@@ -1,23 +1,20 @@
 package com.trunk.rx.jdbc;
 
-import java.math.BigInteger;
-
-import org.jooq.Field;
-import org.jooq.Record;
-import org.jooq.SQLDialect;
-import org.jooq.Table;
-import org.jooq.impl.SQLDataType;
-import org.testng.annotations.Test;
-
 import com.trunk.rx.jdbc.h2.H2ConnectionProvider;
 import com.trunk.rx.jdbc.jooq.sql.Execute;
 import com.trunk.rx.jdbc.jooq.sql.InsertReturning;
 import com.trunk.rx.jdbc.jooq.sql.Select;
 import com.trunk.rx.jdbc.pg.PgConnectionProvider;
 import com.trunk.rx.jdbc.test.LiquibaseBootstrap;
-
-import rx.Observable;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.SQLDialect;
+import org.jooq.Table;
+import org.jooq.impl.SQLDataType;
+import org.testng.annotations.Test;
 import rx.observers.TestSubscriber;
+
+import java.math.BigInteger;
 
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
@@ -314,50 +311,49 @@ public class FunctionalTests {
     String database =  System.getenv("DB_PASSWORD");
     String username = System.getenv("DB_USER");
     String password = System.getenv("DB_PASSWORD");
-    Observable<ConnectionPool> cp =
+    ConnectionPool.from(
       LiquibaseBootstrap.using(
         new PgConnectionProvider(host, database, username, password, 4)
-      ).map(ConnectionPool::from);
-    cp.flatMap(
-      pool ->
-        pool.execute(
-          connection ->
-            Execute.using(connection, c -> using(c, SQLDialect.POSTGRES).delete(TEST_AUTOID))
-              .ignoreElements()
-              .concatWith(
-                Execute.using(
-                  connection,
-                  c ->
-                    using(c, SQLDialect.POSTGRES).alterSequence("test_autoid_id_seq").restartWith(BigInteger.ONE)
-                )
-                .ignoreElements()
-              )
-              .concatWith(
-                InsertReturning.using(
-                  connection,
-                  c ->
-                    using(c, SQLDialect.POSTGRES)
-                      .insertInto(TEST_AUTOID)
-                      .set(NAME, "foo")
-                      .returning(ID),
-                  record -> record.getValue(ID)
-                )
-              )
-              .concatWith(
-                InsertReturning.using(
-                  connection,
-                  c ->
-                    using(c, SQLDialect.POSTGRES)
-                      .insertInto(TEST_AUTOID)
-                      .columns(NAME)
-                      .values("bar")
-                      .values("baz")
-                      .returning(ID),
-                  record -> record.get(ID)
-                )
-              )
-        )
+      )
     )
+      .execute(
+        connection ->
+          Execute.using(connection, c -> using(c, SQLDialect.POSTGRES).delete(TEST_AUTOID))
+            .ignoreElements()
+            .concatWith(
+              Execute.using(
+                connection,
+                c ->
+                  using(c, SQLDialect.POSTGRES).alterSequence("test_autoid_id_seq").restartWith(BigInteger.ONE)
+              )
+              .ignoreElements()
+            )
+            .concatWith(
+              InsertReturning.using(
+                connection,
+                c ->
+                  using(c, SQLDialect.POSTGRES)
+                    .insertInto(TEST_AUTOID)
+                    .set(NAME, "foo")
+                    .returning(ID),
+                record -> record.getValue(ID)
+              )
+            )
+            .concatWith(
+              InsertReturning.using(
+                connection,
+                c ->
+                  using(c, SQLDialect.POSTGRES)
+                    .insertInto(TEST_AUTOID)
+                    .columns(NAME)
+                    .values("bar")
+                    .values("baz")
+                    .returning(ID),
+                record -> record.get(ID)
+              )
+            )
+
+      )
       .subscribe(t);
 
     t.assertNoErrors();

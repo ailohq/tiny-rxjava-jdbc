@@ -1,16 +1,14 @@
 package com.trunk.rx.jdbc.jooq.sql;
 
-import java.sql.Connection;
-
+import com.trunk.rx.jdbc.jooq.Util;
 import org.jooq.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.trunk.rx.jdbc.jooq.Util;
-
 import rx.Observable;
 import rx.Subscriber;
 import rx.subscriptions.Subscriptions;
+
+import java.sql.Connection;
 
 /**
  * An {@link Observable} that wraps {@link Query#execute()} and emits a single

@@ -1,7 +1,5 @@
 package com.trunk.rx.jdbc.jooq.sql;
 
-import java.sql.Connection;
-
 import org.jooq.InsertResultStep;
 import org.jooq.Query;
 import org.jooq.Record;
@@ -9,10 +7,11 @@ import org.jooq.RecordMapper;
 import org.jooq.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import rx.Observable;
 import rx.Subscriber;
 import rx.subscriptions.Subscriptions;
+
+import java.sql.Connection;
 
 import static com.trunk.rx.jdbc.jooq.Util.closeQuietly;
 

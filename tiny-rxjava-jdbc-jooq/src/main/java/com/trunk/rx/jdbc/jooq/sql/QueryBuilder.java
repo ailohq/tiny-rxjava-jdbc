@@ -1,8 +1,8 @@
 package com.trunk.rx.jdbc.jooq.sql;
 
-import java.sql.Connection;
-
 import org.jooq.Query;
+
+import java.sql.Connection;
 
 /**
  * A functional interface to defer the creation of

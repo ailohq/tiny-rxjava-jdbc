@@ -1,12 +1,11 @@
 package com.trunk.rx.jdbc;
 
-import java.sql.SQLException;
-
-import javax.inject.Singleton;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Scopes;
+
+import javax.inject.Singleton;
+import java.sql.SQLException;
 
 public class ConnectionPoolModule extends AbstractModule {
 
