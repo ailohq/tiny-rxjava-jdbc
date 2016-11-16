@@ -27,7 +27,7 @@ public class H2ConnectionProvider implements ConnectionProvider {
       log.error("Error loading class for H2 JDBC driver", e);
       throw new RuntimeException(e);
     }
-    connectionPool =  JdbcConnectionPool.create("jdbc:h2:mem:" + name, "sa", "sa");
+    connectionPool =  JdbcConnectionPool.create("jdbc:h2:mem:" + name + ";DATABASE_TO_UPPER=false", "sa", "sa");
   }
 
   @Override
