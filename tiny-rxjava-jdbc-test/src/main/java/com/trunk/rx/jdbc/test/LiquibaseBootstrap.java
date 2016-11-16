@@ -49,10 +49,13 @@ public class LiquibaseBootstrap {
     Database database = null;
     try {
       database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+      database.setDatabaseChangeLogTableName("CHANGELOG");
+      database.setDatabaseChangeLogLockTableName("CHANGELOGLOCK");
       Liquibase liquibase = new Liquibase("migrations.xml", new ClassLoaderResourceAccessor(), database);
       liquibase.update(new Contexts());
 
       for (String updateFile : updateFiles) {
+        database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
         Liquibase l = new Liquibase(updateFile, new ClassLoaderResourceAccessor(), database);
         l.update(new Contexts());
       }

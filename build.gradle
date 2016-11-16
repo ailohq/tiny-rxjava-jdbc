@@ -3,7 +3,7 @@ apply plugin: 'maven'
 
 group = 'com.trunk.rx.jdbc'
 
-def baseVersion = '1.5.1'
+def baseVersion = '1.5.2'
 
 description = 'Functional access to JDBC using RxJava'
 
