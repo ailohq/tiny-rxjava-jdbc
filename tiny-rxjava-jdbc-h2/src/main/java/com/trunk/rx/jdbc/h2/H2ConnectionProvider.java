@@ -21,7 +21,7 @@ public class H2ConnectionProvider implements ConnectionProvider {
   }
 
   public H2ConnectionProvider(String name) {
-    this(name, ";DATABASE_TO_UPPER=false");
+    this(name, "");
   }
 
   public H2ConnectionProvider(String name, String options) {

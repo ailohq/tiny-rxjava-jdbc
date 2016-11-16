@@ -61,7 +61,7 @@ public class H2ConnectionProviderTest {
 
   @Test
   public void shouldNotUpperCaseNamesOnCreate() throws Exception {
-    try (H2ConnectionProvider provider = new H2ConnectionProvider("H2ConnectionPoolProviderTest-shouldNotUpperCaseNamesOnCreate")) {
+    try (H2ConnectionProvider provider = new H2ConnectionProvider("H2ConnectionPoolProviderTest-shouldNotUpperCaseNamesOnCreate", ";DATABASE_TO_UPPER=false")) {
       ConnectionPool.from(provider)
         .execute(
           connection -> {
