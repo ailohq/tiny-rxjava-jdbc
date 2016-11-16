@@ -21,13 +21,17 @@ public class H2ConnectionProvider implements ConnectionProvider {
   }
 
   public H2ConnectionProvider(String name) {
+    this(name, ";DATABASE_TO_UPPER=false");
+  }
+
+  public H2ConnectionProvider(String name, String options) {
     try {
       Class.forName("org.h2.Driver");
     } catch (ClassNotFoundException e) {
       log.error("Error loading class for H2 JDBC driver", e);
       throw new RuntimeException(e);
     }
-    connectionPool =  JdbcConnectionPool.create("jdbc:h2:mem:" + name, "sa", "sa");
+    connectionPool =  JdbcConnectionPool.create("jdbc:h2:mem:" + name + options, "sa", "sa");
   }
 
   @Override

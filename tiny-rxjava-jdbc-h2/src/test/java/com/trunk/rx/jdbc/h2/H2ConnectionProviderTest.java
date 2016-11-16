@@ -1,6 +1,7 @@
 package com.trunk.rx.jdbc.h2;
 
 import com.trunk.rx.jdbc.ConnectionPool;
+import com.trunk.rx.jdbc.sql.ExecuteQuery;
 import org.testng.annotations.Test;
 import rx.observers.TestSubscriber;
 
@@ -55,6 +56,30 @@ public class H2ConnectionProviderTest {
         .subscribe(tSelect);
 
       tSelect.assertValues(7);
+    }
+  }
+
+  @Test
+  public void shouldNotUpperCaseNamesOnCreate() throws Exception {
+    try (H2ConnectionProvider provider = new H2ConnectionProvider("H2ConnectionPoolProviderTest-shouldNotUpperCaseNamesOnCreate")) {
+      ConnectionPool.from(provider)
+        .execute(
+          connection -> {
+            try {
+              return just(connection.prepareStatement("CREATE TABLE tEst (iD int)").execute())
+                .concatWith(
+                  ExecuteQuery.using(
+                    connection,
+                    c -> c.prepareStatement("SELECT \"iD\" FROM \"tEst\""),
+                    resultSet -> true
+                  )
+                );
+            } catch (SQLException e) {
+              throw new RuntimeException(e)
+;            }
+          }
+        )
+      .subscribe();
     }
   }
 }
