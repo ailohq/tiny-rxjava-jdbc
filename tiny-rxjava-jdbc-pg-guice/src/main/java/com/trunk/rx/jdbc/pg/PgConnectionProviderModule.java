@@ -27,7 +27,7 @@ public class PgConnectionProviderModule extends AbstractModule {
       String database = configuration.getString(Keys.DATABASE_DATABASE);
       String username = configuration.getString(Keys.DATABASE_USERNAME);
       String password = configuration.getString(Keys.DATABASE_PASSWORD);
-      int maxConnections = configuration.getInteger(Keys.DATABASE_MAX_CONNECTIONS, 4);
+      int maxConnections = configuration.getInteger(Keys.DATABASE_MAX_CONNECTIONS, Keys.DEFAULT_MAX_CONNECTIONS);
       connectionProvider = new PgConnectionProvider(
           host,
           database,
