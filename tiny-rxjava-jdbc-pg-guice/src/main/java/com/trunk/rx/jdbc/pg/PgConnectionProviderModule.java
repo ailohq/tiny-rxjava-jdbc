@@ -23,11 +23,11 @@ public class PgConnectionProviderModule extends AbstractModule {
 
     @Inject
     public Provider(Config configuration) throws SQLException {
-      String host = configuration.getString("database_host");
-      String database = configuration.getString("database_database");
-      String username = configuration.getString("database_username");
-      String password = configuration.getString("database_password");
-      int maxConnections = configuration.getInteger("database_maxConnections", 25);
+      String host = configuration.getString(Keys.DATABASE_HOST);
+      String database = configuration.getString(Keys.DATABASE_DATABASE);
+      String username = configuration.getString(Keys.DATABASE_USERNAME);
+      String password = configuration.getString(Keys.DATABASE_PASSWORD);
+      int maxConnections = configuration.getInteger(Keys.DATABASE_MAX_CONNECTIONS, 4);
       connectionProvider = new PgConnectionProvider(
           host,
           database,
