@@ -31,10 +31,12 @@ public class InsertReturningProducer<R extends Record, T> implements Producer {
 
   private final AtomicLong requested = new AtomicLong(0);
 
-  public InsertReturningProducer(Subscriber<? super T> subscriber,
-                                 Query query,
-                                 Iterable<? extends R> result,
-                                 RecordMapper<? super R, ? extends T> recordMapper) {
+  public InsertReturningProducer(
+    Subscriber<? super T> subscriber,
+    Query query,
+    Iterable<? extends R> result,
+    RecordMapper<? super R, ? extends T> recordMapper
+  ) {
     this.subscriber = subscriber;
     this.query = query;
     this.result = result.iterator();
@@ -46,7 +48,6 @@ public class InsertReturningProducer<R extends Record, T> implements Producer {
    * Processes each row of the {@link ResultSet}.
    *
    * @param subscriber
-   *
    * @throws SQLException
    */
   private void processRow(Subscriber<? super T> subscriber) throws SQLException {
@@ -77,7 +78,7 @@ public class InsertReturningProducer<R extends Record, T> implements Producer {
   private void requestAll() {
     // fast path
     try {
-      while(keepGoing) {
+      while (keepGoing) {
         processRow(subscriber);
       }
       closeQuietly();
@@ -93,11 +94,11 @@ public class InsertReturningProducer<R extends Record, T> implements Producer {
     long previousCount = getAndAddRequest(requested, n);
     if (previousCount == 0) {
       try {
-        while(true) {
+        while (true) {
           long r = requested.get();
           long numToEmit = r;
 
-          while(keepGoing && --numToEmit >= 0) {
+          while (keepGoing && --numToEmit >= 0) {
             processRow(subscriber);
           }
           if (keepGoing) {

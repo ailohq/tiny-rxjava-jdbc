@@ -23,8 +23,10 @@ public class PgHikariConnectionProvider implements ConnectionProvider {
       log.error("Error loading class for PostgreSQL JDBC driver", e);
       throw new RuntimeException(e);
     }
+    String jdbcUrl = String.format("jdbc:postgresql://%s/%s", host, database);
+    log.info("Starting HikariDataSource with Url: {}, Username: {}, maxPoolSize: {}", jdbcUrl, username, maxConnections);
     dataSource = new HikariDataSource();
-    dataSource.setJdbcUrl(String.format("jdbc:postgresql://%s/%s", host, database));
+    dataSource.setJdbcUrl(jdbcUrl);
     dataSource.setUsername(username);
     dataSource.setPassword(password);
     dataSource.setMaximumPoolSize(maxConnections);

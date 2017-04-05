@@ -15,10 +15,10 @@ import java.sql.PreparedStatement;
  * {@link PreparedStatementBuilder} in an {@link Observable}. It emits a single {@link Void}
  * event on completion - the output is suppressed since
  * execute is a legacy general-purpose methods.
- *
+ * <p>
  * The {@link PreparedStatement} will be canceled if the subscriber unsubscribes
  * before completion.
- *
+ * <p>
  * It manages the lifecycle of the {@link PreparedStatement}
  * and does not close the given {@link Connection}.
  */

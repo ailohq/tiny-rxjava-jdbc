@@ -19,12 +19,12 @@ import static com.trunk.rx.jdbc.jooq.Util.closeQuietly;
  * An {@link Observable} that wraps {@link InsertResultStep#fetch()} and emits an
  * event for row of the returned {@link Result}. Each row is unmarshalled using
  * the given {@link RecordMapper}.
- *
+ * <p>
  * The Query will be canceled if the subscriber unsubscribes
  * before completion, but since this is an insert the Query will
  * <i>not</i> be canceled if the subscriber unsubscribes
  * after the first {@link Record} is retrieved.
- *
+ * <p>
  * This manages the lifecycle of the Query and does not close the {@link Connection}.
  */
 public class InsertReturning<R extends Record, T> extends Observable<T> {
@@ -48,12 +48,15 @@ public class InsertReturning<R extends Record, T> extends Observable<T> {
         try (InsertResultStep<? extends R> query = queryBuilder.build(connection)) {
           Iterable<? extends R> result = query.fetch();
           setupUnsubscription(subscriber, query);
-          subscriber.setProducer(new InsertReturningProducer<>(
-            subscriber,
-            query,
-            result,
-            recordMapper
-          ));
+          log.debug("InsertReturning setProducer for {}", query);
+          subscriber.setProducer(
+            new InsertReturningProducer<>(
+              subscriber,
+              query,
+              result,
+              recordMapper
+            )
+          );
         } catch (Throwable t) {
           handleException(t, subscriber);
         }
@@ -70,10 +73,10 @@ public class InsertReturning<R extends Record, T> extends Observable<T> {
   }
 
   private static <T> void handleException(Throwable t, Subscriber<? super T> subscriber) {
-    log.debug("onError: " + t.getMessage());
-    if (subscriber.isUnsubscribed())
+    log.debug("onError: ", t);
+    if (subscriber.isUnsubscribed()) {
       log.debug("unsubscribed");
-    else {
+    } else {
       subscriber.onError(t);
     }
   }

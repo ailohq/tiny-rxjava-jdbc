@@ -29,7 +29,11 @@ public class NamedParameterPreparedStatementBuilder implements PreparedStatement
     return new NamedParameterPreparedStatementBuilder(sql, Collections.emptyList(), Collections.emptyList());
   }
 
-  private NamedParameterPreparedStatementBuilder(String sql, Collection<NamedTypedObject> parameters, Collection<SqlObjectConverter<Object>> converters) {
+  private NamedParameterPreparedStatementBuilder(
+    String sql,
+    Collection<NamedTypedObject> parameters,
+    Collection<SqlObjectConverter<Object>> converters
+  ) {
     this.sql = sql;
     this.converters = Collections.unmodifiableCollection(converters);
     this.parameters = Collections.unmodifiableCollection(parameters);
@@ -50,10 +54,11 @@ public class NamedParameterPreparedStatementBuilder implements PreparedStatement
 
   /**
    * Add a new parameter. Parameters with duplicate names wil replace existing parameters.
-   * @param name  the name of the parameter as it appears in the query
-   * @param o     the object to be added
-   * @param type  the type from {@link java.sql.Types}
-   * @return      a new {@link NamedParameterPreparedStatementBuilder} with the added object
+   *
+   * @param name the name of the parameter as it appears in the query
+   * @param o    the object to be added
+   * @param type the type from {@link java.sql.Types}
+   * @return a new {@link NamedParameterPreparedStatementBuilder} with the added object
    */
   public NamedParameterPreparedStatementBuilder add(String name, Object o, int type) throws SQLException {
     List<NamedTypedObject> newParameters = new ArrayList<>();
@@ -92,6 +97,7 @@ public class NamedParameterPreparedStatementBuilder implements PreparedStatement
     NamedTypedObject(String name, Object object, int type) {
       this.name = name;
       this.object = object;
-      this.type = type;}
+      this.type = type;
+    }
   }
 }

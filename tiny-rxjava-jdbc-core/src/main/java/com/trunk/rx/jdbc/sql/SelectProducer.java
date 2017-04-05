@@ -33,10 +33,12 @@ public class SelectProducer<T> implements Producer {
 
   private final AtomicLong requested = new AtomicLong(0);
 
-  public SelectProducer(ResultSetMapper<? extends T> resultSetMapper,
-                 Subscriber<? super T> subscriber,
-                 PreparedStatement preparedStatement,
-                 ResultSet resultSet) {
+  public SelectProducer(
+    ResultSetMapper<? extends T> resultSetMapper,
+    Subscriber<? super T> subscriber,
+    PreparedStatement preparedStatement,
+    ResultSet resultSet
+  ) {
     this.resultSetMapper = resultSetMapper;
     this.subscriber = subscriber;
     this.preparedStatement = preparedStatement;
@@ -58,7 +60,7 @@ public class SelectProducer<T> implements Producer {
   private void requestAll() {
     // fast path
     try {
-      while(keepGoing) {
+      while (keepGoing) {
         processRow(subscriber);
       }
       closeQuietly();
@@ -74,11 +76,11 @@ public class SelectProducer<T> implements Producer {
     long previousCount = getAndAddRequest(requested, n);
     if (previousCount == 0) {
       try {
-        while(true) {
+        while (true) {
           long r = requested.get();
           long numToEmit = r;
 
-          while(keepGoing && --numToEmit >= 0) {
+          while (keepGoing && --numToEmit >= 0) {
             processRow(subscriber);
           }
           if (keepGoing) {
@@ -109,7 +111,6 @@ public class SelectProducer<T> implements Producer {
    * Processes each row of the {@link ResultSet}.
    *
    * @param subscriber
-   *
    * @throws SQLException
    */
   private void processRow(Subscriber<? super T> subscriber) throws SQLException {

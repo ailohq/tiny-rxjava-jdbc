@@ -8,7 +8,6 @@ import java.sql.SQLException;
  * do not allow concurrent access.
  *
  * @param <T> type of the result
- *
  * @see ExecuteQuery
  */
 @FunctionalInterface

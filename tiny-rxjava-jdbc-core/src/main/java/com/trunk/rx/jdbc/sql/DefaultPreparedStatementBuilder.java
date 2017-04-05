@@ -48,9 +48,10 @@ public class DefaultPreparedStatementBuilder implements PreparedStatementBuilder
 
   /**
    * Add a new parameter. These are indexed in the order they are added.
-   * @param o     the object to be added
-   * @param type  the type from {@link java.sql.Types}
-   * @return      a new {@link DefaultPreparedStatementBuilder} with the added object
+   *
+   * @param o    the object to be added
+   * @param type the type from {@link java.sql.Types}
+   * @return a new {@link DefaultPreparedStatementBuilder} with the added object
    */
   public DefaultPreparedStatementBuilder add(Object o, int type) {
     List<TypedObject> newParameters = new ArrayList<>();
@@ -63,7 +64,7 @@ public class DefaultPreparedStatementBuilder implements PreparedStatementBuilder
   public PreparedStatement build(Connection connection) throws SQLException {
     PreparedStatement statement = connection.prepareStatement(sql);
 
-    for(int i = 0; i < parameters.size(); ++i) {
+    for (int i = 0; i < parameters.size(); ++i) {
       TypedObject o = parameters.get(0);
       if (o.object == null) {
         statement.setNull(i, o.type);

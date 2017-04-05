@@ -11,7 +11,7 @@ import java.sql.SQLException;
  * Allows the execution of a {@link ConnectionConsumer} in a transaction context.
  * Defaults to using auto-commit transactions. It can be subscribed to as the
  * result of the given {@link ConnectionConsumer}.
- *
+ * <p>
  * TransactionContextExecutor manages the lifecycle of the connection objects it creates
  * by getting a connection from the {@link ConnectionProvider} for each subscription.
  *
@@ -29,9 +29,11 @@ public class TransactionContextExecutor<T> extends Observable<T> {
   private final ConnectionProvider provider;
   private final ConnectionConsumer<T> connectionConsumer;
 
-  public TransactionContextExecutor(TransactionContext transactionContext,
-                                    ConnectionProvider provider,
-                                    ConnectionConsumer<T> connectionConsumer) {
+  public TransactionContextExecutor(
+    TransactionContext transactionContext,
+    ConnectionProvider provider,
+    ConnectionConsumer<T> connectionConsumer
+  ) {
     super(subscriber -> transactionContext.f(provider, connectionConsumer).subscribe(subscriber));
     this.provider = provider;
     this.connectionConsumer = connectionConsumer;
@@ -159,16 +161,16 @@ public class TransactionContextExecutor<T> extends Observable<T> {
     public <T> Observable<T> f(ConnectionProvider provider, ConnectionConsumer<T> consumer) {
       return autoclosingConnection(provider)
         .flatMap(
-            c -> {
-              UnclosableConnection unclosableConnection = new UnclosableConnection(c);
-              return TransactionContextExecutor.<T>withManualTransactions(c)
-                .concatWith(consumer.call(unclosableConnection))
-                .doOnCompleted(() -> commitTransaction(c))
-                .doOnError(e -> rollBackTransaction(c))
-                .doOnUnsubscribe(() -> cleanupConnection(c))
-                .finallyDo(() -> closeConnection(c));
-            }
-          );
+          c -> {
+            UnclosableConnection unclosableConnection = new UnclosableConnection(c);
+            return TransactionContextExecutor.<T>withManualTransactions(c)
+              .concatWith(consumer.call(unclosableConnection))
+              .doOnCompleted(() -> commitTransaction(c))
+              .doOnError(e -> rollBackTransaction(c))
+              .doOnUnsubscribe(() -> cleanupConnection(c))
+              .finallyDo(() -> closeConnection(c));
+          }
+        );
     }
   }
 
@@ -177,16 +179,16 @@ public class TransactionContextExecutor<T> extends Observable<T> {
     public <T> Observable<T> f(ConnectionProvider provider, ConnectionConsumer<T> consumer) {
       return autoclosingConnection(provider)
         .flatMap(
-            c -> {
-              UnclosableConnection unclosableConnection = new UnclosableConnection(c);
-              return TransactionContextExecutor.<T>withManualTransactions(c)
-                .concatWith(consumer.call(unclosableConnection))
-                .doOnNext(t -> commitTransaction(c))
-                .doOnError(e -> rollBackTransaction(c))
-                .doOnUnsubscribe(() -> cleanupConnection(c))
-                .finallyDo(() -> closeConnection(c));
-            }
-          );
+          c -> {
+            UnclosableConnection unclosableConnection = new UnclosableConnection(c);
+            return TransactionContextExecutor.<T>withManualTransactions(c)
+              .concatWith(consumer.call(unclosableConnection))
+              .doOnNext(t -> commitTransaction(c))
+              .doOnError(e -> rollBackTransaction(c))
+              .doOnUnsubscribe(() -> cleanupConnection(c))
+              .finallyDo(() -> closeConnection(c));
+          }
+        );
     }
   }
 }

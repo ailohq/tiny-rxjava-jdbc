@@ -15,49 +15,55 @@ import java.sql.ResultSet;
  * An observable that wraps {@link PreparedStatement#executeQuery()} from the given
  * {@link PreparedStatementBuilder} in an {@link Observable}. The given {@link ResultSetMapper}
  * is used to unmarshal each returned row.
- *
+ * <p>
  * The {@link ResultSet} and {@link PreparedStatement} will be canceled if the subscriber unsubscribes
  * before completion.
- *
+ * <p>
  * It manages the lifecycle of the
  * {@link PreparedStatement} and the required {@link ResultSet} and does not close the given {@link Connection}.
  */
 public class ExecuteQuery<T> extends Observable<T> {
   private static final Logger log = LoggerFactory.getLogger(ExecuteQuery.class);
 
-  public static <T> ExecuteQuery<T> using(Connection connection,
-                                          PreparedStatementBuilder preparedStatementBuilder,
-                                          ResultSetMapper<? extends T> resultSetMapper) {
+  public static <T> ExecuteQuery<T> using(
+    Connection connection,
+    PreparedStatementBuilder preparedStatementBuilder,
+    ResultSetMapper<? extends T> resultSetMapper
+  ) {
     return new ExecuteQuery<>(connection, preparedStatementBuilder, resultSetMapper);
   }
 
-  private ExecuteQuery(Connection connection,
-                       PreparedStatementBuilder preparedStatementBuilder,
-                       ResultSetMapper<? extends T> resultSetMapper) {
-      super(
-        subscriber -> {
-          try (PreparedStatement preparedStatement = preparedStatementBuilder.build(connection)) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-              setupUnsubscription(subscriber, preparedStatement, resultSet);
-              subscriber.setProducer(
-                new SelectProducer<>(
-                  resultSetMapper,
-                  subscriber,
-                  preparedStatement,
-                  resultSet
-                )
-              );
-            }
-          } catch (Throwable t) {
-            handleException(t, subscriber);
+  private ExecuteQuery(
+    Connection connection,
+    PreparedStatementBuilder preparedStatementBuilder,
+    ResultSetMapper<? extends T> resultSetMapper
+  ) {
+    super(
+      subscriber -> {
+        try (PreparedStatement preparedStatement = preparedStatementBuilder.build(connection)) {
+          try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            setupUnsubscription(subscriber, preparedStatement, resultSet);
+            subscriber.setProducer(
+              new SelectProducer<>(
+                resultSetMapper,
+                subscriber,
+                preparedStatement,
+                resultSet
+              )
+            );
           }
+        } catch (Throwable t) {
+          handleException(t, subscriber);
         }
-      );
+      }
+    );
   }
 
-  private static <T> void setupUnsubscription(Subscriber<? super T> subscriber,
-                                              PreparedStatement preparedStatement,
-                                              ResultSet resultSet) {
+  private static <T> void setupUnsubscription(
+    Subscriber<? super T> subscriber,
+    PreparedStatement preparedStatement,
+    ResultSet resultSet
+  ) {
     subscriber.add(
       Subscriptions.create(
         () -> {

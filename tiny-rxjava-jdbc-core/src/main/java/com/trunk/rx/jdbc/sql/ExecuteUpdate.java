@@ -14,10 +14,10 @@ import java.sql.PreparedStatement;
  * An observable that wraps {@link PreparedStatement#executeUpdate()} from the given
  * {@link PreparedStatementBuilder} in an {@link Observable}. It emits a single {@link Integer}
  * event containing the result of {@link PreparedStatement#executeUpdate() executeUpdate()}.
- *
+ * <p>
  * The {@link PreparedStatement} will be canceled if the subscriber unsubscribes
  * before completion.
- *
+ * <p>
  * It manages the lifecycle of the
  * {@link PreparedStatement} and does not close the given {@link Connection}.
  */
