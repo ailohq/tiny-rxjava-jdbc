@@ -133,7 +133,7 @@ ConnectionProvider p = new H2ConnectionProvider("pool-name");
 
 Use [jOOQ's](http://www.jooq.org/) DSL to query your database.
 
-* Select using [ExecuteSelect](https://github.com/Trunkplatform/tiny-rxjava-jdbc/blob/master/tiny-rxjava-jdbc-jooq/src/main/java/com/trunk/rx/jdbc/jooq/sql/Select.java)
+* Select using [Select](https://github.com/Trunkplatform/tiny-rxjava-jdbc/blob/master/tiny-rxjava-jdbc-jooq/src/main/java/com/trunk/rx/jdbc/jooq/sql/Select.java)
 * Modify using [Execute](https://github.com/Trunkplatform/tiny-rxjava-jdbc/blob/master/tiny-rxjava-jdbc-jooq/src/main/java/com/trunk/rx/jdbc/jooq/sql/Execute.java)
 * Insert Returning using [InsertReturning](https://github.com/Trunkplatform/tiny-rxjava-jdbc/blob/master/tiny-rxjava-jdbc-jooq/src/main/java/com/trunk/rx/jdbc/jooq/sql/InsertReturning.java)
   when supported by the database. 
